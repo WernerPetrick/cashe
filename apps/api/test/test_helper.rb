@@ -15,6 +15,11 @@ end
 
 module ActionDispatch
   class IntegrationTest
+    include ApiContract
+
+    # Wednesday 2026-10-21 10:40 SAST: inside the tuckshop fixture's recess window.
+    RECESS = Time.utc(2026, 10, 21, 8, 40)
+
     teardown { AppwriteAuth.verifier = nil }
 
     def sign_in_as(appwrite_user_id, token: "valid-jwt", name: "Pat Parent")
@@ -23,8 +28,17 @@ module ActionDispatch
       { "Authorization" => "Bearer #{token}" }
     end
 
+    # Signs in as a fixture user and returns the auth headers.
+    def as(user)
+      sign_in_as(user.appwrite_user_id, name: user.display_name)
+    end
+
     def json
       response.parsed_body
+    end
+
+    def error_code
+      json.dig("error", "code")
     end
   end
 end

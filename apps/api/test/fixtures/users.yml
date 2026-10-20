@@ -12,3 +12,8 @@ stranger:
   appwrite_user_id: appwrite-stranger
   display_name: Stranger Danger
   role: adult
+
+kid:
+  appwrite_user_id: appwrite-kid
+  display_name: Kai Kid
+  role: child

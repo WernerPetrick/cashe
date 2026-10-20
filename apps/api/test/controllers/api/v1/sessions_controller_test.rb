@@ -5,7 +5,7 @@ class Api::V1::SessionsControllerTest < ActionDispatch::IntegrationTest
     headers = sign_in_as("appwrite-new", name: "Nia")
 
     assert_difference("User.count", 1) { post api_v1_session_path, headers: headers }
-    assert_response :ok
+    assert_contract :ok
     assert_equal({ "display_name" => "Nia", "role" => "adult" }, json.except("id"))
   end
 
@@ -17,7 +17,7 @@ class Api::V1::SessionsControllerTest < ActionDispatch::IntegrationTest
   test "rejects a missing token" do
     post api_v1_session_path
 
-    assert_response :unauthorized
+    assert_contract :unauthorized
     assert_equal "unauthorized", json.dig("error", "code")
   end
 end

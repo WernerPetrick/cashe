@@ -1,31 +1,21 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  api:
+    # The one place error codes become user-facing text.
+    errors:
+      unauthorized: "A valid Appwrite JWT is required."
+      auth_unavailable: "Sign-in could not be checked. Try again."
+      not_found: "We couldn't find that."
+      forbidden: "You can't do that with this wallet."
+      validation_failed: "Some details need fixing."
+      invalid_location: "Send near as latitude,longitude."
+      invalid_ping: "Send latitude, longitude and accuracy_m."
+      invalid_amount: "Amounts are positive whole numbers of cents."
+      invalid_idempotency_key: "Send an idempotency_key of up to 100 characters."
+      insufficient_funds: "There isn't enough money in this wallet."
+      wallet_closed: "This wallet is closed."
+      wallet_locked: "This wallet is locked. Stay at the place until it unlocks."
+      idempotency_conflict: "That idempotency_key was already used with different details."
+      invalid_claim: "This gift link isn't valid any more."
+      own_gift: "You can't claim your own gift."
+      not_cancellable: "Only a gift that hasn't been claimed can be cancelled."
+      rate_limited: "Too many requests. Wait a moment and try again."
