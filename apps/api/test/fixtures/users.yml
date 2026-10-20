@@ -2,3 +2,13 @@ parent:
   appwrite_user_id: appwrite-parent
   display_name: Pat Parent
   role: adult
+
+friend:
+  appwrite_user_id: appwrite-friend
+  display_name: Sam Friend
+  role: adult
+
+stranger:
+  appwrite_user_id: appwrite-stranger
+  display_name: Stranger Danger
+  role: adult

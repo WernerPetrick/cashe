@@ -1,0 +1,13 @@
+# Rules for the unlock engine and gifts. Durations are in seconds.
+shared:
+  # How long a wallet stays spendable after an unlock (open decision in CLAUDE.md).
+  spend_window_seconds: <%= ENV.fetch("CASHE_SPEND_WINDOW_SECONDS", 600) %>
+  # An unclaimed gift refunds to its sender after this long (ADR 0002).
+  claim_window_seconds: 259200
+  # A gap between pings longer than this ends the presence session.
+  ping_gap_seconds: 45
+  # Pings less accurate than this are rejected.
+  max_accuracy_m: 50
+  allow_mock_locations: false
+  claim_url_base: https://cashe.app/claim/
+  currencies: [ZAR, USD, EUR, GBP]

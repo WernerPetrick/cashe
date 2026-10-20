@@ -1,0 +1,31 @@
+# Parent's gift to Sam, already claimed; spendable weekdays 10:30–11:00.
+tuckshop_gift:
+  kind: gift
+  name: Tuckshop money
+  owner: friend
+  funder: parent
+  place: tuckshop
+  currency: USD
+  status: active
+  claimed_at: 2026-10-19 08:00:00
+
+# Sent but not yet claimed.
+pending_gift:
+  kind: gift
+  name: Coffee on me
+  funder: parent
+  place: tuckshop
+  currency: ZAR
+  status: pending
+  claim_token_digest: <%= Digest::SHA256.hexdigest("pending-gift-token") %>
+  claim_expires_at: 2026-10-23 08:00:00
+
+bike_goal:
+  kind: goal
+  name: New bike
+  owner: parent
+  funder: parent
+  place: mikes_bikes
+  currency: ZAR
+  status: active
+  target_cents: 450000

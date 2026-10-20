@@ -9,7 +9,6 @@ default: &default
   port: <%= ENV.fetch("DB_PORT") { 5433 } %>
   username: <%= ENV.fetch("DB_USERNAME") { "cashe" } %>
   password: <%= ENV.fetch("DB_PASSWORD") { "cashe" } %>
-  schema_search_path: public
 
 development:
   <<: *default

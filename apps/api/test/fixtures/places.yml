@@ -1,0 +1,14 @@
+# Centre of the tuckshop zone; tests ping from here (inside) or ~200 m north (outside).
+tuckshop:
+  name: School Tuckshop
+  location: "SRID=4326;POINT(18.4241 -33.9249)"
+  radius_m: 50
+  dwell_seconds: 30
+  created_by: parent
+
+mikes_bikes:
+  name: Mike's Bikes
+  location: "SRID=4326;POINT(18.4700 -33.9600)"
+  radius_m: 40
+  dwell_seconds: 120
+  created_by: parent

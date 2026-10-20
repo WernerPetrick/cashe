@@ -36,6 +36,10 @@ module Api
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
+    # structure.sql keeps the ledger append-only trigger, which schema.rb cannot express.
+    config.active_record.schema_format = :sql
+
+    config.x.cashe = config_for(:cashe)
     config.x.appwrite = config_for(:appwrite)
 
     # Only loads a smaller set of middleware suitable for API only apps.
