@@ -274,7 +274,7 @@ end
 ## Working agreements for Claude Code
 
 - Work phase by phase (see Roadmap). Do not start a phase until the previous gate passes.
-- Make small, focused commits with conventional messages (`feat(api): …`, `fix(mobile): …`).
+- Don't commit, push or take any GitHub actions (PRs, `gh` commands, triggering workflows); the developer does all of that. Leave changes uncommitted and, when a task is done, summarise them with a suggested conventional commit message (`feat(api): …`, `fix(mobile): …`).
 - Record real decisions as ADRs in `docs/adr/NNNN-title.md`.
 - Ask before adding a new gem or package not listed here, changing the data model's ledger or privacy rules, or touching CI and deployment config.
 - Never commit secrets. Use Rails credentials and `.env` files that are gitignored.
