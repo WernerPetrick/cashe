@@ -110,6 +110,10 @@ fvm flutter test
 fvm flutter analyze
 ```
 
+The API's schema is `db/structure.sql` (it holds the ledger's append-only trigger, which `schema.rb` can't). Migrating dumps it with `pg_dump` and tests load it with `psql`, so both must be at least as new as the database server. With Homebrew's `libpq` (PostgreSQL 18 tools): `export PATH="/opt/homebrew/opt/libpq/bin:$PATH"`.
+
+Request tests check every response against `packages/api_contract/openapi.yaml` with `assert_contract :status` (committee), so an endpoint change fails its tests until the spec is updated too.
+
 Always run the relevant tests and linters before saying a task is done.
 
 ## Architecture

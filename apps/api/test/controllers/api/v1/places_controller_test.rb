@@ -23,6 +23,14 @@ class Api::V1::PlacesControllerTest < ActionDispatch::IntegrationTest
     assert_empty json["places"]
   end
 
+  test "never logs the search point" do
+    log = Rails.root.join("log/test.log")
+    before = log.size
+    get api_v1_places_path(near: "-33.92501234,18.42411234"), headers: as(users(:friend))
+
+    assert_no_match(/33\.9250|18\.4241/, log.read.byteslice(before..))
+  end
+
   test "rejects an unreadable point" do
     get api_v1_places_path(near: "somewhere"), headers: as(users(:friend))
 
