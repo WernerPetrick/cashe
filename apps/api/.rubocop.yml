@@ -1,0 +1,25 @@
+# Omakase Ruby styling for Rails
+inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - "bin/**/*"
+    - "db/**/*schema.rb"
+    - "vendor/**/*"
+
+# Sandi Metz's rules (see CLAUDE.md). Breaking one needs a written reason.
+Metrics/ClassLength:
+  Enabled: true
+  Max: 100
+
+Metrics/MethodLength:
+  Enabled: true
+  Max: 5
+  Exclude:
+    - "db/migrate/**/*"
+
+Metrics/ParameterLists:
+  Enabled: true
+  Max: 4
+  CountKeywordArgs: true
