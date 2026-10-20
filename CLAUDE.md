@@ -9,7 +9,7 @@ Cashe is a wallet whose money only unlocks at a chosen place, optionally within 
 Two modes share one unlock engine:
 
 - **Personal goal:** a user funds their own wallet (e.g. bicycle savings that only unlock at Mike's Bikes).
-- **Gifted funds:** a sender funds a wallet for someone else, restricted to a place and optionally a time window (e.g. a parent's pocket money that only works at the school tuckshop during recess). The sender may set an expiry date; unspent money then refunds to the sender. A blank expiry means the money stays in the recipient's wallet until spent.
+- **Gifted funds:** a sender funds a wallet for someone else, restricted to a place and optionally a time window (e.g. a parent's pocket money that only works at the school tuckshop during recess, or a friend's coffee at a favourite café). The recipient claims it through a one-time link (ADR 0002); an unclaimed gift can be cancelled by the sender and refunds automatically after 3 days. The sender may set an expiry date; unspent money then refunds to the sender. A blank expiry means the money stays in the recipient's wallet until spent.
 
 A wallet unlocks only when all three pass:
 
@@ -81,7 +81,7 @@ Each app must stay independently buildable. Never import across `apps/`; the onl
 | Spatial | `activerecord-postgis-adapter` + RGeo |
 | Jobs | Solid Queue (no Redis) |
 | Auth | Appwrite Auth; Rails verifies the JWT via the `appwrite` Ruby gem |
-| Tests | Minitest (Rails); `flutter_test` + `mocktail` |
+| Tests | Minitest + `committee` (responses checked against the OpenAPI spec) (Rails); `flutter_test` + `mocktail` |
 | Lint | RuboCop (`rubocop-rails-omakase` + Sandi Metz metrics below); `flutter_lints` |
 | CI | GitHub Actions, path-filtered per app |
 
@@ -144,7 +144,7 @@ The Appwrite server API key lives only in Rails credentials. Never put it in the
 | --- | --- | --- |
 | `users` | `appwrite_user_id` (unique), `display_name`, `role` (adult/child) | Mirrors Appwrite Auth; no passwords |
 | `places` | `name`, `location` (geography point, SRID 4326), `radius_m`, `dwell_seconds` | GiST index on `location` |
-| `wallets` | `kind` (goal/gift), `owner_id`, `funder_id`, `place_id`, `name`, `status`, `expires_at`, `target_cents` | Goal: owner = funder. Gift: `expires_at` set by sender; null = never expires |
+| `wallets` | `kind` (goal/gift), `owner_id`, `funder_id`, `place_id`, `name`, `currency`, `status` (pending/active/cancelled/expired), `expires_at`, `target_cents`, `claim_token_digest`, `claim_expires_at`, `claimed_at` | Goal: owner = funder. Gift: owner is null until claimed; `expires_at` set by sender, null = never expires |
 | `time_windows` | `wallet_id`, `days_of_week` (int array), `starts_at`, `ends_at`, `time_zone` | None = any time |
 | `ledger_entries` | `wallet_id`, `amount_cents` (signed), `kind` (deposit/spend/refund), `idempotency_key` (unique) | Append-only |
 | `presence_sessions` | `wallet_id`, `user_id`, `entered_at`, `last_ping_at`, `unlocked_at`, `ended_at` | Timestamps only |
@@ -163,7 +163,7 @@ The Appwrite server API key lives only in Rails credentials. Never put it in the
 - Never persist raw coordinates. Use them for the check, then discard. Do not log them.
 - Location is requested in the foreground only, and only on the unlock screen.
 - A funder never sees the recipient's location — only that money was spent and the place name.
-- Child accounts are created and managed by a parent.
+- A claim token is stored only as a digest and works once.
 
 ## API
 
@@ -182,6 +182,8 @@ Versioned JSON under `/api/v1`. Keep `packages/api_contract/openapi.yaml` update
 | POST | `/wallets/:id/presence_pings` | Location ping → dwell progress or unlock (owner only) |
 | POST | `/wallets/:id/spends` | Spend during an active unlock (owner only) |
 | GET | `/wallets/:id/ledger_entries` | Paged history |
+| POST | `/wallets/:id/cancellation` | Cancel an unclaimed gift and refund it (funder only) |
+| POST | `/gift_claims` | Claim a gift with its one-time token |
 
 Presence ping response:
 
@@ -319,4 +321,6 @@ The demo tells the tuckshop story in about three minutes: a parent creates a $10
 - Payments partner: virtual cards (e.g. Stripe Issuing) with the unlock engine answering real-time authorization webhooks.
 - Device integrity: Play Integrity and App Attest.
 - Optional merchant-side presence proof (rotating QR or NFC).
+- Parent-managed child accounts (a parent creates a child login and gifts to it directly).
+- Locking a gift to a recipient's phone number or email.
 - Licensing and compliance advice before holding real funds.
