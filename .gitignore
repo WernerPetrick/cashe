@@ -1,0 +1,27 @@
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+
+# FVM (the pinned version lives in .fvmrc)
+.fvm/
+
+# Rails (apps/api)
+apps/api/.bundle
+apps/api/log/*
+!apps/api/log/.keep
+apps/api/tmp/*
+!apps/api/tmp/.keep
+apps/api/tmp/pids/*
+!apps/api/tmp/pids/.keep
+apps/api/storage/*
+!apps/api/storage/.keep
+apps/api/config/master.key
+apps/api/config/credentials/*.key
+apps/api/coverage/
