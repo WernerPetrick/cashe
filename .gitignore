@@ -25,3 +25,7 @@ apps/api/storage/*
 apps/api/config/master.key
 apps/api/config/credentials/*.key
 apps/api/coverage/
+
+# Flutter codegen (regenerate with build_runner)
+apps/mobile/**/*.g.dart
+apps/mobile/**/*.freezed.dart
