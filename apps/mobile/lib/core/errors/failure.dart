@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:flutter/foundation.dart';
 
 /// An expected failure with a stable [code]. The one place that maps codes to
 /// user-facing text is [message].
@@ -7,12 +8,21 @@ class Failure implements Exception {
 
   /// Maps an Appwrite SDK error to a [Failure].
   factory Failure.fromAppwrite(AppwriteException error) {
+    if (kDebugMode) {
+      debugPrint(
+        'Appwrite error: ${error.code} ${error.type} ${error.message}',
+      );
+    }
     return switch (error.type) {
       'user_invalid_credentials' => const Failure(invalidCredentials),
       'user_blocked' => const Failure(blocked),
       'general_rate_limit_exceeded' => const Failure(rateLimited),
+      // Only a missing or dead session means "sign in again"; other 401s
+      // (e.g. user_session_already_exists) are not expiry.
+      'user_jwt_invalid' ||
+      'user_unauthorized' ||
+      'general_unauthorized_scope' => const Failure(unauthorized),
       _ when error.code == null || error.code == 0 => const Failure(network),
-      _ when error.code == 401 => const Failure(unauthorized),
       _ => const Failure(unknown),
     };
   }

@@ -15,6 +15,11 @@ module Users
     private
 
     def find_or_create(identity)
+      User.find_by(appwrite_user_id: identity.appwrite_user_id) || create(identity)
+    end
+
+    # Two first requests can race; the unique index settles it and we read the winner.
+    def create(identity)
       User.create_or_find_by!(appwrite_user_id: identity.appwrite_user_id) do |user|
         user.display_name = identity.display_name
       end

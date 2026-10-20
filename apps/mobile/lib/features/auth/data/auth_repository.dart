@@ -37,7 +37,7 @@ class AuthRepository {
       if (error.code == 401) return null;
       throw Failure.fromAppwrite(error);
     }
-    return _exchange();
+    return _unwrap(await _api.get('/me', AppUser.fromJson));
   }
 
   Future<AppUser> signIn({
@@ -45,15 +45,31 @@ class AuthRepository {
     required String password,
   }) async {
     try {
-      await _account.createEmailPasswordSession(
-        email: email,
-        password: password,
-      );
+      await _createSession(email, password);
     } on AppwriteException catch (error) {
-      throw Failure.fromAppwrite(error);
+      if (error.type != _sessionAlreadyExists) {
+        throw Failure.fromAppwrite(error);
+      }
+      // A session survived an earlier, half-finished sign-in. It may belong to
+      // someone else, so end it and sign in as the person typing now.
+      await signOut();
+      try {
+        await _createSession(email, password);
+      } on AppwriteException catch (retryError) {
+        throw Failure.fromAppwrite(retryError);
+      }
     }
     _jwt.invalidate();
     return _exchange();
+  }
+
+  static const _sessionAlreadyExists = 'user_session_already_exists';
+
+  Future<void> _createSession(String email, String password) {
+    return _account.createEmailPasswordSession(
+      email: email,
+      password: password,
+    );
   }
 
   Future<void> signOut() async {
@@ -66,8 +82,13 @@ class AuthRepository {
     }
   }
 
+  /// First sign-in on this device: POST /session creates the Cashe user if new.
   Future<AppUser> _exchange() async {
-    return switch (await _api.post('/session', AppUser.fromJson)) {
+    return _unwrap(await _api.post('/session', AppUser.fromJson));
+  }
+
+  AppUser _unwrap(ApiResult<AppUser> result) {
+    return switch (result) {
       ApiSuccess(:final value) => value,
       ApiFailure(:final failure) => throw failure,
     };
