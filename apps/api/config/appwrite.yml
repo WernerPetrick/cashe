@@ -1,0 +1,7 @@
+# Appwrite project used for Auth. Neither value is secret; the server API key
+# (when one is needed) lives in Rails credentials, never here.
+shared:
+  endpoint: <%= ENV.fetch("APPWRITE_ENDPOINT", "https://fra.cloud.appwrite.io/v1") %>
+  project_id: <%= ENV.fetch("APPWRITE_PROJECT_ID", "6ad71a680004138e628a") %>
+  # Appwrite JWTs live 15 minutes; a verified token is trusted this long before re-checking.
+  jwt_cache_seconds: 60

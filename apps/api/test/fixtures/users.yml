@@ -1,0 +1,4 @@
+parent:
+  appwrite_user_id: appwrite-parent
+  display_name: Pat Parent
+  role: adult

@@ -8,15 +8,69 @@ servers:
     description: Local development
 security:
   - appwriteJwt: []
-paths: {}
+paths:
+  /session:
+    post:
+      operationId: createSession
+      summary: Exchange an Appwrite JWT for the Cashe user (created on first call)
+      responses:
+        "200":
+          description: The signed-in user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          $ref: "#/components/responses/AuthUnavailable"
+  /me:
+    get:
+      operationId: getMe
+      summary: The current user
+      responses:
+        "200":
+          description: The signed-in user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          $ref: "#/components/responses/AuthUnavailable"
 components:
   securitySchemes:
     appwriteJwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Short-lived JWT issued by Appwrite Auth.
+      description: Short-lived JWT issued by Appwrite Auth (Account.createJWT).
+  responses:
+    Unauthorized:
+      description: Missing, expired or rejected JWT (code `unauthorized`)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    AuthUnavailable:
+      description: Appwrite could not be reached to check the JWT (code `auth_unavailable`)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
   schemas:
+    User:
+      type: object
+      required: [id, display_name, role]
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+        role:
+          type: string
+          enum: [adult, child]
     Error:
       type: object
       required: [error]
