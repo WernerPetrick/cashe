@@ -1,0 +1,85 @@
+name: API
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "packages/api_contract/**"
+      - ".github/workflows/api.yml"
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "packages/api_contract/**"
+      - ".github/workflows/api.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: apps/api
+
+jobs:
+  lint:
+    name: Lint and security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: apps/api
+          bundler-cache: true
+
+      - name: RuboCop (omakase + Sandi Metz metrics)
+        run: bin/rubocop -f github
+
+      - name: Brakeman
+        run: bin/brakeman --no-pager
+
+      - name: Bundler Audit
+        run: bin/bundler-audit
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgis/postgis:18-3.6
+        env:
+          POSTGRES_USER: cashe
+          POSTGRES_PASSWORD: cashe
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U cashe"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      RAILS_ENV: test
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USERNAME: cashe
+      DB_PASSWORD: cashe
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: apps/api
+          bundler-cache: true
+
+      - name: Prepare database
+        run: bin/rails db:prepare
+
+      - name: Run tests
+        run: bin/rails test
