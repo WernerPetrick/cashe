@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/theme.dart';
+import '../../../core/errors/failure.dart';
 import '../../../core/widgets/cashe_widgets.dart';
 import 'auth_controller.dart';
+import 'widgets/sign_in_steps.dart';
 
+enum SignInStep { email, signIn, signUp }
+
+/// Email first, then a password step. Appwrite can't tell the app whether an
+/// email already has an account, so the password step starts as sign-in and
+/// switches to sign-up (and back) with one tap.
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
 
@@ -12,113 +20,162 @@ class SignInScreen extends ConsumerStatefulWidget {
 }
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _password = TextEditingController();
-  bool _submitting = false;
+  final _name = TextEditingController();
+  var _step = SignInStep.email;
+  var _submitting = false;
   String? _error;
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _name.dispose();
     super.dispose();
   }
 
+  void _continue() {
+    if (!validEmail(_email.text)) {
+      setState(() => _error = 'Enter a valid email address.');
+      return;
+    }
+    _goTo(SignInStep.signIn);
+  }
+
+  void _goTo(SignInStep step, {String? error}) => setState(() {
+    _step = step;
+    _error = error;
+    _password.clear();
+  });
+
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _submitting = true;
-      _error = null;
-    });
-    final failure = await ref
-        .read(authControllerProvider.notifier)
-        .signIn(email: _email.text.trim(), password: _password.text);
+    final problem = _step == SignInStep.signUp
+        ? signUpProblem(_name.text, _password.text)
+        : (_password.text.isEmpty ? 'Enter your password.' : null);
+    setState(() => _error = problem);
+    if (problem != null) return;
+
+    setState(() => _submitting = true);
+    final failure = await _attempt();
     if (!mounted) return;
-    setState(() {
-      _submitting = false;
-      _error = failure?.message;
-    });
+    setState(() => _submitting = false);
+    if (failure?.code == Failure.accountExists) {
+      _goTo(SignInStep.signIn, error: 'You already have a wallet. Sign in.');
+    } else {
+      setState(() => _error = failure?.message);
+    }
+  }
+
+  Future<Failure?> _attempt() {
+    final auth = ref.read(authControllerProvider.notifier);
+    final email = _email.text.trim();
+    return _step == SignInStep.signUp
+        ? auth.signUp(
+            name: _name.text.trim(),
+            email: email,
+            password: _password.text,
+          )
+        : auth.signIn(email: email, password: _password.text);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: _SignInFields(
-                email: _email,
-                password: _password,
-                submitting: _submitting,
-                error: _error,
-                onSubmit: _submit,
-              ),
+    final atEmail = _step == SignInStep.email;
+    return PopScope(
+      canPop: atEmail,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _goTo(SignInStep.email);
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _Header(onBack: atEmail ? null : () => _goTo(SignInStep.email)),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 350),
+                    child: atEmail ? _emailStep() : _passwordStep(),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
   }
+
+  Widget _emailStep() => EmailStep(
+    key: const ValueKey(SignInStep.email),
+    email: _email,
+    error: _error,
+    onChanged: () => setState(() => _error = null),
+    onContinue: _continue,
+  );
+
+  Widget _passwordStep() => PasswordStep(
+    key: const ValueKey('password-step'),
+    signingUp: _step == SignInStep.signUp,
+    email: _email.text.trim(),
+    password: _password,
+    name: _name,
+    error: _error,
+    submitting: _submitting,
+    onChanged: () => setState(() => _error = null),
+    onSubmit: _submit,
+    onChangeEmail: () => _goTo(SignInStep.email),
+    onSwitchMode: () => _goTo(
+      _step == SignInStep.signUp ? SignInStep.signIn : SignInStep.signUp,
+    ),
+  );
 }
 
-class _SignInFields extends StatelessWidget {
-  const _SignInFields({
-    required this.email,
-    required this.password,
-    required this.submitting,
-    required this.error,
-    required this.onSubmit,
-  });
+/// Logo and name, with a Back pill once past the email step.
+class _Header extends StatelessWidget {
+  const _Header({required this.onBack});
 
-  final TextEditingController email;
-  final TextEditingController password;
-  final bool submitting;
-  final String? error;
-  final VoidCallback onSubmit;
+  final VoidCallback? onBack;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+  Widget build(BuildContext context) => SizedBox(
+    height: 40,
+    child: Row(
       children: [
-        const Align(
-          alignment: Alignment.centerLeft,
-          child: CasheLogo(size: 56),
+        const CasheLogo(size: 32),
+        const SizedBox(width: 10),
+        const Text(
+          'Cashe',
+          style: TextStyle(
+            fontSize: 19,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.4,
+            color: CasheColors.text,
+          ),
         ),
-        const SizedBox(height: 20),
-        Text('Cashe', style: theme.textTheme.displaySmall),
-        const SizedBox(height: 32),
-        TextFormField(
-          controller: email,
-          decoration: const InputDecoration(labelText: 'Email'),
-          keyboardType: TextInputType.emailAddress,
-          autofillHints: const [AutofillHints.email],
-          validator: (v) => (v ?? '').contains('@') ? null : 'Enter your email',
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: password,
-          decoration: const InputDecoration(labelText: 'Password'),
-          obscureText: true,
-          autofillHints: const [AutofillHints.password],
-          validator: (v) => (v ?? '').isEmpty ? 'Enter your password' : null,
-          onFieldSubmitted: (_) => onSubmit(),
-        ),
-        if (error != null) ...[
-          const SizedBox(height: 16),
-          Text(error!, style: TextStyle(color: theme.colorScheme.error)),
-        ],
-        const SizedBox(height: 24),
-        FilledButton(
-          onPressed: submitting ? null : onSubmit,
-          child: Text(submitting ? 'Signing in…' : 'Sign in'),
-        ),
+        const Spacer(),
+        if (onBack case final back?) PillButton(label: 'Back', onPressed: back),
       ],
-    );
-  }
+    ),
+  );
 }
+
+/// Same rule as the design: something@something.tld.
+bool validEmail(String email) =>
+    RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$').hasMatch(email.trim());
+
+/// Why a new account can't be created yet, or null if it can.
+String? signUpProblem(String name, String password) {
+  if (name.trim().isEmpty) return 'Enter your name.';
+  if (!passwordLongEnough(password) || !passwordHasNumber(password)) {
+    return 'Your password needs 8+ characters and a number.';
+  }
+  return null;
+}
+
+bool passwordLongEnough(String password) => password.length >= 8;
+
+bool passwordHasNumber(String password) => RegExp(r'\d').hasMatch(password);

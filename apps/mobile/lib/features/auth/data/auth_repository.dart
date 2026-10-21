@@ -40,6 +40,31 @@ class AuthRepository {
     return (await _api.get('/me', AppUser.fromJson)).unwrap();
   }
 
+  /// Creates the Appwrite account, then signs in as it. [name] is what funders
+  /// see ("Claimed by …").
+  Future<AppUser> signUp({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _account.create(
+        userId: ID.unique(),
+        email: email,
+        password: password,
+        name: name,
+      );
+    } on AppwriteException catch (error) {
+      // The email is checked before this, so a bad argument is the password
+      // failing Appwrite's rules (e.g. too short or too common).
+      if (error.type == 'general_argument_invalid') {
+        throw const Failure(Failure.weakPassword);
+      }
+      throw Failure.fromAppwrite(error);
+    }
+    return signIn(email: email, password: password);
+  }
+
   Future<AppUser> signIn({
     required String email,
     required String password,

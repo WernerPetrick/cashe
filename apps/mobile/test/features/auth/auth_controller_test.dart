@@ -59,6 +59,22 @@ void main() {
     expect(container.read(authControllerProvider).value, isNull);
   });
 
+  test('signs up and exposes the user', () async {
+    when(() => repository.restore()).thenAnswer((_) async => null);
+    when(() => repository.signUp(name: 'Pat', email: 'p@x.io', password: 'pw1'))
+        .thenAnswer((_) async => parent);
+    await container.read(authControllerProvider.future);
+
+    final failure = await controller().signUp(
+      name: 'Pat',
+      email: 'p@x.io',
+      password: 'pw1',
+    );
+
+    expect(failure, isNull);
+    expect(container.read(authControllerProvider).value, parent);
+  });
+
   test('signs out', () async {
     when(() => repository.restore()).thenAnswer((_) async => parent);
     when(() => repository.signOut()).thenAnswer((_) async {});

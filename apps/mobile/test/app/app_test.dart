@@ -21,8 +21,11 @@ void main() {
         child: const CasheApp(),
       ),
     );
-    await tester.pumpAndSettle();
+    // The sign-in art pulses forever, so step frames instead of settling.
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 200));
+    }
 
-    expect(find.text('Sign in'), findsOneWidget);
+    expect(find.text('Money that waits for the right place.'), findsOneWidget);
   });
 }

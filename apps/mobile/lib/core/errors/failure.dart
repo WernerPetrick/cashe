@@ -16,6 +16,9 @@ class Failure implements Exception {
     return switch (error.type) {
       'user_invalid_credentials' => const Failure(invalidCredentials),
       'user_blocked' => const Failure(blocked),
+      'user_already_exists' => const Failure(accountExists),
+      'password_recently_used' ||
+      'password_personal_data' => const Failure(weakPassword),
       'general_rate_limit_exceeded' => const Failure(rateLimited),
       // Only a missing or dead session means "sign in again"; other 401s
       // (e.g. user_session_already_exists) are not expiry.
@@ -32,6 +35,8 @@ class Failure implements Exception {
   static const authUnavailable = 'auth_unavailable';
   static const invalidCredentials = 'invalid_credentials';
   static const blocked = 'blocked';
+  static const accountExists = 'account_exists';
+  static const weakPassword = 'weak_password';
   static const rateLimited = 'rate_limited';
   static const unknown = 'unknown';
 
@@ -46,6 +51,10 @@ class Failure implements Exception {
     authUnavailable => "We couldn't check your sign-in. Try again shortly.",
     invalidCredentials => 'That email and password don’t match.',
     blocked => 'This account has been blocked.',
+    accountExists =>
+      'There’s already a wallet for this email. Sign in instead.',
+    weakPassword =>
+      'Choose a stronger password: 8+ characters, not a common one.',
     rateLimited => 'Too many attempts. Wait a moment and try again.',
     'not_found' => "We couldn't find that wallet.",
     'forbidden' => "You can't do that with this wallet.",
