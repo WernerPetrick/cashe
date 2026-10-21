@@ -17,7 +17,8 @@ class WalletDetailSerializer
   private
 
   def summary
-    WalletSerializer.new(@wallet, viewer: @viewer, balance: @balances.for(@wallet)).as_json
+    WalletSerializer.new(@wallet, viewer: @viewer, balance: @balances.for(@wallet),
+      funded_cents: @balances.funded_cents_for(@wallet)).as_json
   end
 
   def time_windows

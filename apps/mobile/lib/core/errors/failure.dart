@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 /// An expected failure with a stable [code]. The one place that maps codes to
 /// user-facing text is [message].
 class Failure implements Exception {
-  const Failure(this.code);
+  const Failure(this.code, [this.details = const []]);
 
   /// Maps an Appwrite SDK error to a [Failure].
   factory Failure.fromAppwrite(AppwriteException error) {
@@ -37,6 +37,9 @@ class Failure implements Exception {
 
   final String code;
 
+  /// Field-level messages from the API (e.g. validation errors), shown as-is.
+  final List<String> details;
+
   String get message => switch (code) {
     network => "Couldn't reach Cashe. Check your connection and try again.",
     unauthorized => 'Your session has expired. Please sign in again.',
@@ -44,6 +47,21 @@ class Failure implements Exception {
     invalidCredentials => 'That email and password don’t match.',
     blocked => 'This account has been blocked.',
     rateLimited => 'Too many attempts. Wait a moment and try again.',
+    'not_found' => "We couldn't find that wallet.",
+    'forbidden' => "You can't do that with this wallet.",
+    'validation_failed' =>
+      details.isEmpty ? 'Some details need fixing.' : details.join('\n'),
+    'invalid_amount' => 'Enter an amount above zero.',
+    'insufficient_funds' => "There isn't enough money in this wallet.",
+    'wallet_closed' => 'This wallet is closed.',
+    'wallet_locked' =>
+      'This wallet is locked. Stay at the place until it unlocks.',
+    'idempotency_conflict' =>
+      'That request was already sent. Refresh and try again.',
+    'invalid_claim' => "This gift link isn't valid any more.",
+    'own_gift' => "You can't claim your own gift.",
+    'not_cancellable' => 'This gift has already been claimed.',
+    'invalid_location' || 'invalid_ping' => "Your location couldn't be read.",
     _ => 'Something went wrong. Please try again.',
   };
 

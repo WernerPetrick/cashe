@@ -90,8 +90,11 @@ class ApiClient {
         json != null) {
       return ApiSuccess(decode(json));
     }
-    final code = (json?['error'] as Map<String, dynamic>?)?['code'] as String?;
-    return ApiFailure(Failure(code ?? Failure.unknown));
+    final error = json?['error'] as Map<String, dynamic>?;
+    final details = (error?['details'] as List?)?.cast<String>() ?? const [];
+    return ApiFailure(
+      Failure(error?['code'] as String? ?? Failure.unknown, details),
+    );
   }
 
   Map<String, dynamic>? _parse(String body) {

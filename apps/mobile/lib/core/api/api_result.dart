@@ -16,3 +16,11 @@ final class ApiFailure<T> extends ApiResult<T> {
 
   final Failure failure;
 }
+
+extension ApiResultUnwrap<T> on ApiResult<T> {
+  /// The value, or throws the [Failure] for repositories that surface errors as exceptions.
+  T unwrap() => switch (this) {
+    ApiSuccess(:final value) => value,
+    ApiFailure(:final failure) => throw failure,
+  };
+}

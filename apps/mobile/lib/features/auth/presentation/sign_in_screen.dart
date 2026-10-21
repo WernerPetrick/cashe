@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/widgets/cashe_widgets.dart';
 import 'auth_controller.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
@@ -85,6 +86,11 @@ class _SignInFields extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: CasheLogo(size: 56),
+        ),
+        const SizedBox(height: 20),
         Text('Cashe', style: theme.textTheme.displaySmall),
         const SizedBox(height: 32),
         TextFormField(

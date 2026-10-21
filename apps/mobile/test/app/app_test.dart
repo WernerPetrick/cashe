@@ -1,5 +1,6 @@
 import 'package:cashe/app/app.dart';
 import 'package:cashe/features/auth/data/auth_repository.dart';
+import 'package:cashe/features/claims/presentation/claim_links.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -13,7 +14,10 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [authRepositoryProvider.overrideWithValue(repository)],
+        overrides: [
+          authRepositoryProvider.overrideWithValue(repository),
+          claimTokensProvider.overrideWith((ref) => const Stream.empty()),
+        ],
         child: const CasheApp(),
       ),
     );

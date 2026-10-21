@@ -10,6 +10,7 @@ class Api::V1::WalletsControllerTest < ActionDispatch::IntegrationTest
     assert_contract :ok
     assert_equal %w[bike_goal pending_gift tuckshop_gift].map { wallets(_1).id }.sort, json["wallets"].pluck("id").sort
     assert_equal 12_000, json["wallets"].find { _1["id"] == wallets(:bike_goal).id }["balance_cents"]
+    assert_equal 12_000, json["wallets"].find { _1["id"] == wallets(:bike_goal).id }["funded_cents"]
   end
 
   test "lists only what a stranger is part of" do
@@ -56,7 +57,7 @@ class Api::V1::WalletsControllerTest < ActionDispatch::IntegrationTest
 
     assert_contract :created
     assert_equal "pending", json["status"]
-    assert_match %r{\Ahttps://cashe.app/claim/}, json["claim_url"]
+    assert_match %r{\Acashe://claim/}, json["claim_url"]
     assert_equal 1, json["time_windows"].size
 
     get api_v1_wallet_path(json["id"]), headers: as(users(:friend))

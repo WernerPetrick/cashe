@@ -37,7 +37,7 @@ class AuthRepository {
       if (error.code == 401) return null;
       throw Failure.fromAppwrite(error);
     }
-    return _unwrap(await _api.get('/me', AppUser.fromJson));
+    return (await _api.get('/me', AppUser.fromJson)).unwrap();
   }
 
   Future<AppUser> signIn({
@@ -84,13 +84,6 @@ class AuthRepository {
 
   /// First sign-in on this device: POST /session creates the Cashe user if new.
   Future<AppUser> _exchange() async {
-    return _unwrap(await _api.post('/session', AppUser.fromJson));
-  }
-
-  AppUser _unwrap(ApiResult<AppUser> result) {
-    return switch (result) {
-      ApiSuccess(:final value) => value,
-      ApiFailure(:final failure) => throw failure,
-    };
+    return (await _api.post('/session', AppUser.fromJson)).unwrap();
   }
 }

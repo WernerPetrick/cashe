@@ -9,5 +9,6 @@ shared:
   # Pings less accurate than this are rejected.
   max_accuracy_m: 50
   allow_mock_locations: false
-  claim_url_base: https://cashe.app/claim/
+  # Custom scheme for now (opens the app directly); https App Links can replace it in Phase 4.
+  claim_url_base: cashe://claim/
   currencies: [ZAR, USD, EUR, GBP]

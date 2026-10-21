@@ -15,7 +15,7 @@ class Wallets::CreateTest < ActiveSupport::TestCase
     assert_nil created.wallet.owner
     assert_equal ClaimToken.digest(created.claim_token.value), created.wallet.claim_token_digest
     assert_equal @clock.current + 3.days, created.wallet.claim_expires_at
-    assert_match %r{\Ahttps://cashe.app/claim/[\w-]{40,}\z}, created.claim_token.url
+    assert_match %r{\Acashe://claim/[\w-]{40,}\z}, created.claim_token.url
   end
 
   test "creates a goal owned by its funder, with no claim link" do

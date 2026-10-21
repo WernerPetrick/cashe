@@ -1,9 +1,10 @@
 # A wallet as one viewer sees it (owner or funder), with its computed balance.
 class WalletSerializer
-  def initialize(wallet, viewer:, balance:)
+  def initialize(wallet, viewer:, balance:, funded_cents:)
     @wallet = wallet
     @viewer = viewer
     @balance = balance
+    @funded_cents = funded_cents
   end
 
   def as_json(*)
@@ -19,7 +20,8 @@ class WalletSerializer
   end
 
   def money
-    { currency: @wallet.currency, balance_cents: @balance.cents, target_cents: @wallet.target_cents }
+    { currency: @wallet.currency, balance_cents: @balance.cents, funded_cents: @funded_cents,
+      target_cents: @wallet.target_cents }
   end
 
   def dates
