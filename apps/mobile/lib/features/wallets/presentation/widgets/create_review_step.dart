@@ -179,9 +179,12 @@ class CreateReviewStep extends StatelessWidget {
 
   Future<void> _pickExpiry(BuildContext context) async {
     final now = DateTime.now();
+    final tomorrow = now.add(const Duration(days: 1));
+    // Start on the earliest allowed day, so OK without tapping a day still sets it.
     final day = await showDatePicker(
       context: context,
-      firstDate: now.add(const Duration(days: 1)),
+      initialDate: tomorrow,
+      firstDate: tomorrow,
       lastDate: now.add(const Duration(days: 365)),
     );
     if (day != null) onExpiry(DateTime(day.year, day.month, day.day, 23, 59));

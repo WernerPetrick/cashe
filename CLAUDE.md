@@ -107,6 +107,7 @@ fvm flutter pub get
 fvm dart run build_runner build --delete-conflicting-outputs
 fvm flutter run --dart-define=FLAVOR=dev --dart-define=API_URL=http://10.0.2.2:3000
 fvm flutter test
+fvm flutter test integration_test -d emulator-5554   # happy path on a device
 fvm flutter analyze
 ```
 
