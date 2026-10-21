@@ -144,6 +144,15 @@ class _Totals extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final totals = _totals;
+    final chips = [
+      for (final other in totals.skip(1)) _Chip(other.format()),
+      if (pots.isNotEmpty)
+        _Chip(
+          '${pots.length} locked ${pots.length == 1 ? 'pot' : 'pots'}',
+          amber: true,
+        ),
+      if (sentCount > 0) _Chip('$sentCount sent as gifts'),
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -153,19 +162,10 @@ class _Totals extends StatelessWidget {
           totals.first.format(),
           style: Theme.of(context).textTheme.displayMedium,
         ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final other in totals.skip(1)) _Chip(other.format()),
-            _Chip(
-              '${pots.length} locked ${pots.length == 1 ? 'pot' : 'pots'}',
-              amber: true,
-            ),
-            if (sentCount > 0) _Chip('$sentCount sent as gifts'),
-          ],
-        ),
+        if (chips.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Wrap(spacing: 8, runSpacing: 8, children: chips),
+        ],
       ],
     );
   }
