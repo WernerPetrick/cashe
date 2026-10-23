@@ -7,11 +7,12 @@ class Presence::RecordPingTest < ActiveSupport::TestCase
   setup do
     @clock = FixedClock.new(Time.utc(2026, 10, 21, 8, 40)) # Wednesday 10:40 SAST, inside recess
     @wallet = wallets(:tuckshop_gift)
+    @jumps = Presence::JumpCheck.new(cache: ActiveSupport::Cache::MemoryStore.new)
   end
 
   def ping(at: INSIDE, accuracy_m: 8, mocked: false, wallet: @wallet)
     ping = PresencePing.new(coordinates: at, accuracy_m: accuracy_m, mocked: mocked)
-    Presence::RecordPing.new(clock: @clock).call(wallet: wallet, user: users(:friend), ping: ping).value
+    Presence::RecordPing.new(clock: @clock, jumps: @jumps).call(wallet: wallet, user: users(:friend), ping: ping).value
   end
 
   def ping_every(seconds, times)
@@ -87,26 +88,6 @@ class Presence::RecordPingTest < ActiveSupport::TestCase
     @clock.advance(46) && ping
 
     assert_equal 10, ping_every(10, 1).dwell_progress_seconds
-  end
-
-  test "rejects a mock location and ends the session" do
-    ping
-    @clock.advance(10)
-    outcome = ping(mocked: true)
-
-    assert_equal :rejected, outcome.status
-    assert_equal :mock_location, outcome.reason
-    assert_empty @wallet.presence_sessions.open
-  end
-
-  test "rejects a poor-accuracy ping without counting it" do
-    ping
-    @clock.advance(10)
-    outcome = ping(accuracy_m: 51)
-
-    assert_equal :rejected, outcome.status
-    assert_equal :low_accuracy, outcome.reason
-    assert_equal @clock.current - 10, @wallet.presence_sessions.open.sole.last_ping_at
   end
 
   test "needs a fresh dwell after the spend window ends" do

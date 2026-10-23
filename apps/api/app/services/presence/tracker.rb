@@ -20,9 +20,10 @@ module Presence
       dwell(checks)
     end
 
-    # A spoofed location ends any session; an inaccurate one is simply not counted.
+    # A spoofed or jumping location ends the session and any open unlock (ADR 0004);
+    # an inaccurate one is simply not counted.
     def reject(reason)
-      end_session if reason == :mock_location
+      end_visit unless reason == :low_accuracy
       PingOutcome.build(:rejected, reason: reason)
     end
 
@@ -61,6 +62,11 @@ module Presence
 
     def start_session
       @open_session = @wallet.presence_sessions.create!(user: @user, entered_at: @now, last_ping_at: @now)
+    end
+
+    def end_visit
+      active_unlock&.update!(unlocked_until: @now)
+      end_session
     end
 
     def end_session

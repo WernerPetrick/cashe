@@ -510,7 +510,7 @@ components:
           nullable: true
         reason:
           type: string
-          enum: [mock_location, low_accuracy]
+          enum: [mock_location, low_accuracy, impossible_jump]
           nullable: true
           description: Why a ping was rejected
     Error:

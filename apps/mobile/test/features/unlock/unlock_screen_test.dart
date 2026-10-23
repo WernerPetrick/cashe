@@ -138,6 +138,17 @@ void main() {
     expect(find.textContaining('mock (fake) location'), findsOneWidget);
   });
 
+  testWidgets('an impossible jump is rejected on screen', (tester) async {
+    await pumpScreen(tester);
+    await arriveWith(
+      tester,
+      outcome(PingStatus.rejected, reason: RejectionReason.impossibleJump),
+    );
+
+    expect(find.text('Location rejected'), findsOneWidget);
+    expect(find.textContaining('jumped too far, too fast'), findsOneWidget);
+  });
+
   testWidgets('a low-accuracy fix is rejected on screen', (tester) async {
     await pumpScreen(tester);
     await arriveWith(

@@ -7,7 +7,7 @@ part 'ping_outcome.g.dart';
 enum PingStatus { outsideZone, outsideTimeWindow, dwelling, unlocked, rejected }
 
 @JsonEnum(fieldRename: FieldRename.snake)
-enum RejectionReason { mockLocation, lowAccuracy }
+enum RejectionReason { mockLocation, lowAccuracy, impossibleJump }
 
 /// What the API concluded from one presence ping.
 @freezed

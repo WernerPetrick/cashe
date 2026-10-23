@@ -33,6 +33,27 @@ class Api::V1::Wallets::PresencePingsControllerTest < ActionDispatch::Integratio
     assert_equal "mock_location", json["reason"]
   end
 
+  test "rejects an impossible jump on screen" do
+    with_cache do
+      ping(latitude: -33.8799) # ~5 km north
+      travel(12.seconds)
+      ping
+    end
+
+    assert_contract :ok
+    assert_equal "rejected", json["status"]
+    assert_equal "impossible_jump", json["reason"]
+  end
+
+  # The test cache is a null store; the jump check needs to remember the last ping.
+  def with_cache
+    original = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    yield
+  ensure
+    Rails.cache = original
+  end
+
   test "never logs the coordinates" do
     log = Rails.root.join("log/test.log")
     before = log.size

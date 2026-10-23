@@ -170,6 +170,12 @@ class StillLockedView extends StatelessWidget {
       'Location rejected',
       'Cashe can’t use a mock (fake) location. Turn off any location-spoofing app.',
     ),
+    PingStatus.rejected when outcome.reason == RejectionReason.impossibleJump =>
+      (
+        'rejected',
+        'Location rejected',
+        'Your location jumped too far, too fast. Stay put and try again.',
+      ),
     PingStatus.rejected => (
       'rejected',
       'Location not precise enough',
