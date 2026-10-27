@@ -101,6 +101,8 @@ bin/rails db:prepare
 bin/rails server
 bin/rails test
 bundle exec rubocop
+bin/rails runner ExpireGiftsJob.perform_now                # refund due gifts now (scheduled in production)
+bin/rails runner EndStalePresenceSessionsJob.perform_now   # close sessions that stopped pinging
 
 # Mobile (from apps/mobile)
 fvm flutter pub get
@@ -318,8 +320,9 @@ The demo tells the tuckshop story in about three minutes: a parent creates a $10
 
 ## Open decisions
 
-- Hackathon submission deadline (sets dates on the roadmap).
 - Spend window length after an unlock (assumed 10 minutes).
+
+Decided: the hackathon submission deadline is **31 October 2026**. Phases 0–3 passed by 23 October; Phase 4 fills the time left.
 
 ## Post-hackathon (do not build now)
 

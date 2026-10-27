@@ -9,7 +9,22 @@
 #     priority: 2
 #     schedule: at 5am every day
 
+# Cashe's jobs. Solid Queue's scheduler (`bin/jobs`) runs them in production.
+# Development has no queue database, so run them once by hand there:
+# `bin/rails runner ExpireGiftsJob.perform_now`.
+cashe: &cashe
+  expire_gifts:
+    class: ExpireGiftsJob
+    schedule: every 5 minutes
+  end_stale_presence_sessions:
+    class: EndStalePresenceSessionsJob
+    schedule: every minute
+
+development:
+  <<: *cashe
+
 production:
+  <<: *cashe
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12

@@ -10,6 +10,9 @@ module ActiveSupport
 
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
+
+    # Rate-limit counts and remembered pings never carry over between tests.
+    setup { Rails.cache.clear }
   end
 end
 
