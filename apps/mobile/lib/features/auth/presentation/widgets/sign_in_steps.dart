@@ -12,18 +12,21 @@ const _headline = TextStyle(
   color: CasheColors.text,
 );
 
-/// Step one: the concept art, the pitch and the email field.
 class EmailStep extends StatelessWidget {
   const EmailStep({
     super.key,
     required this.email,
     required this.error,
+    required this.checking,
     required this.onChanged,
     required this.onContinue,
   });
 
   final TextEditingController email;
   final String? error;
+
+  /// True while asking the API whether the email has an account.
+  final bool checking;
   final VoidCallback onChanged;
   final VoidCallback onContinue;
 
@@ -60,7 +63,11 @@ class EmailStep extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        FilledButton(onPressed: onContinue, child: const Text('Continue')),
+        _SubmitButton(
+          label: checking ? 'Checking…' : 'Continue',
+          submitting: checking,
+          onPressed: onContinue,
+        ),
       ],
     ),
   );
@@ -198,7 +205,6 @@ class PasswordStep extends StatelessWidget {
   );
 }
 
-/// The email being used, with a way back to change it.
 class EmailCard extends StatelessWidget {
   const EmailCard({super.key, required this.email, required this.onChange});
 
@@ -245,7 +251,6 @@ class EmailCard extends StatelessWidget {
   );
 }
 
-/// A password input with a Show/Hide toggle.
 class PasswordField extends StatefulWidget {
   const PasswordField({
     super.key,
@@ -291,7 +296,6 @@ class _PasswordFieldState extends State<PasswordField> {
   );
 }
 
-/// The new-password rules, each turning amber once met.
 class PasswordRules extends StatelessWidget {
   const PasswordRules({super.key, required this.password});
 
@@ -335,7 +339,6 @@ class _Rule extends StatelessWidget {
   }
 }
 
-/// A field with the design's small label above it and an error line below.
 class LabelledField extends StatelessWidget {
   const LabelledField({
     super.key,

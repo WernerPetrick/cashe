@@ -184,6 +184,7 @@ Versioned JSON under `/api/v1`. Keep `packages/api_contract/openapi.yaml` update
 | Method | Path | Purpose |
 | --- | --- | --- |
 | POST | `/session` | Exchange Appwrite JWT for the Rails user (creates on first call) |
+| POST | `/account_lookups` | Whether an email has an account, so sign-in opens on the right step (no JWT; rate-limited per IP; ADR 0005) |
 | GET | `/me` | Current user |
 | GET | `/places?near=lat,lng` | Places near a point |
 | POST | `/places` | Create a place |

@@ -56,7 +56,7 @@ class MeTab extends ConsumerWidget {
         ),
         const SizedBox(height: 18),
         const Text(
-          'Money in Cashe is simulated for this demo. No real payments are made.',
+          'Money in Cashe is simulated for this demo.',
           style: TextStyle(fontSize: 13, color: CasheColors.muted),
         ),
       ],

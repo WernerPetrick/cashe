@@ -15,7 +15,6 @@ import 'wallet_providers.dart';
 class AddMoneyScreen extends ConsumerStatefulWidget {
   const AddMoneyScreen({super.key, this.walletId});
 
-  /// Pre-selects this pot (when opened from a pot's page).
   final int? walletId;
 
   @override
@@ -25,6 +24,7 @@ class AddMoneyScreen extends ConsumerStatefulWidget {
 class _AddMoneyScreenState extends ConsumerState<AddMoneyScreen> {
   String _typed = '0';
   int? _selected;
+  String _bank = _FromRow.banks.first;
   bool _saving = false;
   ({int cents, int walletId, String key})? _attempt;
 
@@ -106,7 +106,10 @@ class _AddMoneyScreenState extends ConsumerState<AddMoneyScreen> {
               const SizedBox(height: 20),
               AmountDisplay(typed: _typed, currency: currency),
               const SizedBox(height: 18),
-              const _FromRow(),
+              _FromRow(
+                bank: _bank,
+                onPick: (bank) => setState(() => _bank = bank),
+              ),
               const SizedBox(height: 16),
               const Text(
                 'Put it in',
@@ -147,28 +150,53 @@ class _AddMoneyScreenState extends ConsumerState<AddMoneyScreen> {
   }
 }
 
+/// The pretend account a top-up comes from. Display only: deposits are
+/// simulated, so the API never sees which bank was picked.
 class _FromRow extends StatelessWidget {
-  const _FromRow();
+  const _FromRow({required this.bank, required this.onPick});
+
+  static const banks = [
+    'Simulated bank',
+    'Test Bank',
+    'Sandbox Savings',
+    'Demo Credit Union',
+    'Play Money Bank',
+  ];
+
+  final String bank;
+  final ValueChanged<String> onPick;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
         color: CasheColors.surface,
         border: Border.all(color: CasheColors.border),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Text(
+          const Text(
             'From',
             style: TextStyle(fontSize: 14, color: CasheColors.textBody),
           ),
-          Spacer(),
-          Text(
-            'Simulated bank',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          const SizedBox(width: 12),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: bank,
+                isExpanded: true,
+                alignment: AlignmentDirectional.centerEnd,
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(fontSize: 14, fontWeight: FontWeight.w700),
+                items: [
+                  for (final name in banks)
+                    DropdownMenuItem(value: name, child: Text(name)),
+                ],
+                onChanged: (name) => name == null ? null : onPick(name),
+              ),
+            ),
           ),
         ],
       ),

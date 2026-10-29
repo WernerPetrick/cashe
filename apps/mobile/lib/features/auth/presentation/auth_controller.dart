@@ -8,10 +8,13 @@ final authControllerProvider = AsyncNotifierProvider<AuthController, AppUser?>(
   AuthController.new,
 );
 
-/// Who is signed in: null when signed out.
 class AuthController extends AsyncNotifier<AppUser?> {
   @override
   Future<AppUser?> build() => ref.watch(authRepositoryProvider).restore();
+
+  /// Whether [email] has an account, or null if that can't be checked now.
+  Future<bool?> accountExists(String email) =>
+      ref.read(authRepositoryProvider).accountExists(email);
 
   /// Returns the failure to show, or null on success.
   Future<Failure?> signIn({required String email, required String password}) =>

@@ -40,6 +40,21 @@ class AuthRepository {
     return (await _api.get('/me', AppUser.fromJson)).unwrap();
   }
 
+  /// Whether [email] already has an account, so sign-in opens on the right
+  /// step. Null when the API can't say (offline, rate-limited, Appwrite down).
+  Future<bool?> accountExists(String email) async {
+    final result = await _api.post(
+      '/account_lookups',
+      (json) => json['exists'] as bool,
+      body: {'email': email},
+      signedIn: false,
+    );
+    return switch (result) {
+      ApiSuccess(:final value) => value,
+      ApiFailure() => null,
+    };
+  }
+
   /// Creates the Appwrite account, then signs in as it. [name] is what funders
   /// see ("Claimed by …").
   Future<AppUser> signUp({

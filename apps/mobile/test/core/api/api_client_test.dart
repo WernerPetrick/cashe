@@ -54,6 +54,19 @@ void main() {
     expect(transport.requests.single.headers['authorization'], 'Bearer jwt-1');
   });
 
+  test('sends no JWT when signed out', () async {
+    final transport = FakeTransport([
+      const TransportResponse(200, '{"exists":true}'),
+    ]);
+
+    final result = await clientWith(transport)
+        .post('/account_lookups', identity, body: {}, signedIn: false);
+
+    expect((result as ApiSuccess).value, {'exists': true});
+    expect(transport.requests.single.headers['authorization'], isNull);
+    expect(minted, 0);
+  });
+
   test('maps the error envelope to a failure code', () async {
     final transport = FakeTransport([
       const TransportResponse(

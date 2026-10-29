@@ -8,9 +8,6 @@ import 'widgets/sign_in_steps.dart';
 
 enum SignInStep { email, signIn, signUp }
 
-/// Email first, then a password step. Appwrite can't tell the app whether an
-/// email already has an account, so the password step starts as sign-in and
-/// switches to sign-up (and back) with one tap.
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
 
@@ -24,6 +21,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _name = TextEditingController();
   var _step = SignInStep.email;
   var _submitting = false;
+  var _checking = false;
   String? _error;
 
   @override
@@ -34,12 +32,19 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     super.dispose();
   }
 
-  void _continue() {
+  Future<void> _continue() async {
+    if (_checking) return;
     if (!validEmail(_email.text)) {
       setState(() => _error = 'Enter a valid email address.');
       return;
     }
-    _goTo(SignInStep.signIn);
+    setState(() => _checking = true);
+    final exists = await ref
+        .read(authControllerProvider.notifier)
+        .accountExists(_email.text.trim());
+    if (!mounted) return;
+    _checking = false;
+    _goTo(exists == false ? SignInStep.signUp : SignInStep.signIn);
   }
 
   void _goTo(SignInStep step, {String? error}) => setState(() {
@@ -112,6 +117,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     key: const ValueKey(SignInStep.email),
     email: _email,
     error: _error,
+    checking: _checking,
     onChanged: () => setState(() => _error = null),
     onContinue: _continue,
   );
@@ -133,7 +139,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   );
 }
 
-/// Logo and name, with a Back pill once past the email step.
 class _Header extends StatelessWidget {
   const _Header({required this.onBack});
 
@@ -152,11 +157,9 @@ class _Header extends StatelessWidget {
   );
 }
 
-/// Same rule as the design: something@something.tld.
 bool validEmail(String email) =>
     RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$').hasMatch(email.trim());
 
-/// Why a new account can't be created yet, or null if it can.
 String? signUpProblem(String name, String password) {
   if (name.trim().isEmpty) return 'Enter your name.';
   if (!passwordLongEnough(password) || !passwordHasNumber(password)) {

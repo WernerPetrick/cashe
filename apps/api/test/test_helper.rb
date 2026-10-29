@@ -23,7 +23,10 @@ module ActionDispatch
     # Wednesday 2026-10-21 10:40 SAST: inside the tuckshop fixture's recess window.
     RECESS = Time.utc(2026, 10, 21, 8, 40)
 
-    teardown { AppwriteAuth.verifier = nil }
+    teardown do
+      AppwriteAuth.verifier = nil
+      AppwriteAuth.directory = nil
+    end
 
     def sign_in_as(appwrite_user_id, token: "valid-jwt", name: "Pat Parent")
       identity = AppwriteAuth::Identity.new(appwrite_user_id: appwrite_user_id, name: name)

@@ -24,6 +24,36 @@ paths:
               schema: { $ref: "#/components/schemas/User" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "503": { $ref: "#/components/responses/AuthUnavailable" }
+  /account_lookups:
+    post:
+      operationId: lookUpAccount
+      summary: Whether an email already has an account, so the app opens sign-in or sign-up
+      description: >-
+        Called before sign-in, so it needs no JWT. It reveals whether an email has an
+        account, so it is limited to 10 lookups a minute per IP address.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        "200":
+          description: Whether the email has an account
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [exists]
+                properties:
+                  exists: { type: boolean }
+        "422": { $ref: "#/components/responses/Unprocessable" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "503": { $ref: "#/components/responses/AuthUnavailable" }
   /me:
     get:
       operationId: getMe
@@ -290,7 +320,7 @@ components:
           schema: { $ref: "#/components/schemas/Error" }
     Unprocessable:
       description: >-
-        Invalid input or a refused rule: `validation_failed`, `invalid_location`, `invalid_ping`,
+        Invalid input or a refused rule: `validation_failed`, `invalid_email`, `invalid_location`, `invalid_ping`,
         `invalid_amount`, `invalid_idempotency_key`, `insufficient_funds`, `invalid_claim` or `own_gift`
       content:
         application/json:
@@ -301,7 +331,7 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/Error" }
     AuthUnavailable:
-      description: Appwrite could not be reached to check the JWT (code `auth_unavailable`)
+      description: Appwrite could not be reached to check the JWT or look up the account (code `auth_unavailable`)
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Error" }

@@ -7,6 +7,7 @@ en:
       not_found: "We couldn't find that."
       forbidden: "You can't do that with this wallet."
       validation_failed: "Some details need fixing."
+      invalid_email: "Enter a valid email address."
       invalid_location: "Send near as latitude,longitude."
       invalid_ping: "Send latitude, longitude and accuracy_m."
       invalid_amount: "Amounts are positive whole numbers of cents."

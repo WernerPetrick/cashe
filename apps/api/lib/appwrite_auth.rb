@@ -1,11 +1,14 @@
 # Adapter between Cashe and Appwrite Auth. Everything Appwrite-specific lives here.
 module AppwriteAuth
   class << self
-    # Swappable so tests (and future callers) can inject a verifier.
-    attr_writer :verifier
+    attr_writer :verifier, :directory
 
     def verifier
       @verifier ||= Verifier.new
+    end
+
+    def directory
+      @directory ||= Directory.new
     end
   end
 end

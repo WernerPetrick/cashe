@@ -17,6 +17,9 @@ void main() {
   setUp(() {
     repository = MockAuthRepository();
     when(() => repository.restore()).thenAnswer((_) async => null);
+    when(() => repository.accountExists(any())).thenAnswer((_) async => true);
+    when(() => repository.accountExists('new@example.com'))
+        .thenAnswer((_) async => false);
   });
 
   Future<void> pumpScreen(WidgetTester tester) async {
@@ -53,6 +56,7 @@ void main() {
 
     expect(find.text('Enter a valid email address.'), findsOneWidget);
     expect(find.byKey(const Key('password')), findsNothing);
+    verifyNever(() => repository.accountExists(any()));
   });
 
   testWidgets('signs in with the email from the first step', (tester) async {
@@ -62,6 +66,7 @@ void main() {
     await pumpScreen(tester);
     await continueWith(tester, ' sam@example.com ');
 
+    expect(find.text('WELCOME BACK'), findsOneWidget);
     expect(find.text('Enter your password'), findsOneWidget);
     expect(find.text('sam@example.com'), findsOneWidget);
     await tester.enterText(find.byKey(const Key('password')), 'secret123');
@@ -71,6 +76,28 @@ void main() {
     verify(
       () => repository.signIn(email: 'sam@example.com', password: 'secret123'),
     ).called(1);
+  });
+
+  testWidgets('a new email opens on creating a wallet', (tester) async {
+    await pumpScreen(tester);
+    await continueWith(tester, ' new@example.com ');
+
+    expect(find.text('NEW TO CASHE'), findsOneWidget);
+    expect(find.text('Create your wallet'), findsOneWidget);
+    expect(find.text('Create account'), findsOneWidget);
+    verify(() => repository.accountExists('new@example.com')).called(1);
+  });
+
+  testWidgets('opens on sign-in when the lookup is unavailable', (
+    tester,
+  ) async {
+    when(() => repository.accountExists('new@example.com'))
+        .thenAnswer((_) async => null);
+    await pumpScreen(tester);
+    await continueWith(tester, 'new@example.com');
+
+    expect(find.text('WELCOME BACK'), findsOneWidget);
+    expect(find.text('New to Cashe? Create your wallet'), findsOneWidget);
   });
 
   testWidgets('shows the failure message from a rejected sign-in', (
@@ -92,8 +119,6 @@ void main() {
   ) async {
     await pumpScreen(tester);
     await continueWith(tester, 'new@example.com');
-    await tester.tap(find.text('New to Cashe? Create your wallet'));
-    await settle(tester);
 
     expect(find.text('Create your wallet'), findsOneWidget);
     await tester.enterText(find.byKey(const Key('name')), 'Sam');
@@ -124,8 +149,6 @@ void main() {
     ).thenAnswer((_) async => sam);
     await pumpScreen(tester);
     await continueWith(tester, 'new@example.com');
-    await tester.tap(find.text('New to Cashe? Create your wallet'));
-    await settle(tester);
     await tester.enterText(find.byKey(const Key('name')), ' Sam ');
     await tester.enterText(find.byKey(const Key('password')), 'secret123');
     await tester.tap(find.text('Create account'));

@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resource :session, only: :create
+      resources :account_lookups, only: :create
       get "me", to: "me#show"
 
       resources :places, only: %i[index create]

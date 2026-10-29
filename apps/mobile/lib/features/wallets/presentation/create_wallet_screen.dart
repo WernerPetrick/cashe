@@ -224,12 +224,7 @@ class _AmountStep extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 6),
-        const Text(
-          'Simulated money: no real payment is taken.',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 13.5, color: CasheColors.muted),
-        ),
+
         const Spacer(),
         AmountKeypad(onKey: onKey),
         const SizedBox(height: 12),

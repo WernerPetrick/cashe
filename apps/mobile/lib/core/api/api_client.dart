@@ -41,20 +41,22 @@ class ApiClient {
     String path,
     Decoder<T> decode, {
     Object? body,
-  }) => _request('POST', path, decode, body: body);
+    bool signedIn = true,
+  }) => _request('POST', path, decode, body: body, signedIn: signedIn);
 
   Future<ApiResult<T>> _request<T>(
     String method,
     String path,
     Decoder<T> decode, {
     Object? body,
+    bool signedIn = true,
   }) async {
     try {
-      var response = await _send(method, path, body);
-      if (response.statusCode == HttpStatus.unauthorized) {
+      var response = await _send(method, path, body, signedIn);
+      if (signedIn && response.statusCode == HttpStatus.unauthorized) {
         // The JWT may have been revoked or expired early: mint a new one once.
         _jwt.invalidate();
-        response = await _send(method, path, body);
+        response = await _send(method, path, body, signedIn);
       }
       return _decode(response, decode);
     } on AppwriteException catch (error) {
@@ -70,12 +72,14 @@ class ApiClient {
     String method,
     String path,
     Object? body,
+    bool signedIn,
   ) async {
     return _transport.send(
       method,
       _baseUrl.resolve('/api/v1$path'),
       headers: {
-        HttpHeaders.authorizationHeader: 'Bearer ${await _jwt.token()}',
+        if (signedIn)
+          HttpHeaders.authorizationHeader: 'Bearer ${await _jwt.token()}',
         HttpHeaders.acceptHeader: 'application/json',
         if (body != null) HttpHeaders.contentTypeHeader: 'application/json',
       },

@@ -53,6 +53,9 @@ class FakeCasheApi implements HttpTransport {
         : jsonDecode(body) as Map<String, dynamic>;
     bodies[call] = json;
 
+    if (call == 'POST /account_lookups') {
+      return _ok({'exists': names.containsKey(json['email'])});
+    }
     final viewer = _viewer(headers['authorization']);
     if (viewer == null) return _error(401, 'unauthorized');
     final response = _route(method, path, uri, json, viewer);
