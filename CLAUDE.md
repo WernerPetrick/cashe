@@ -111,6 +111,11 @@ fvm flutter run --dart-define=FLAVOR=dev --dart-define=API_URL=http://10.0.2.2:3
 fvm flutter test
 fvm flutter test integration_test -d emulator-5554   # happy path on a device
 fvm flutter analyze
+
+# Demo recordings (from the repo root; emulator running, DB_* env as for Rails)
+scripts/demo_location walk-in --place 1    # walk the emulator into a place's zone and stay
+scripts/demo_location teleport --place 1   # sit 5 km away, then jump in (rejected as impossible_jump)
+adb shell screenrecord /sdcard/take.mp4    # Ctrl+C to stop (3 min max), then adb pull /sdcard/take.mp4
 ```
 
 The API's schema is `db/structure.sql` (it holds the ledger's append-only trigger, which `schema.rb` can't). Migrating dumps it with `pg_dump` and tests load it with `psql`, so both must be at least as new as the database server. With Homebrew's `libpq` (PostgreSQL 18 tools): `export PATH="/opt/homebrew/opt/libpq/bin:$PATH"`.

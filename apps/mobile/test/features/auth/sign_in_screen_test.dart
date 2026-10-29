@@ -169,6 +169,6 @@ void main() {
     await tester.tap(find.text('Change'));
     await settle(tester);
 
-    expect(find.text('Money that waits for the right place.'), findsOneWidget);
+    expect(find.text('Spend it where you meant to.'), findsOneWidget);
   });
 }

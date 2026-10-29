@@ -26,6 +26,6 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
     }
 
-    expect(find.text('Money that waits for the right place.'), findsOneWidget);
+    expect(find.text('Spend it where you meant to.'), findsOneWidget);
   });
 }

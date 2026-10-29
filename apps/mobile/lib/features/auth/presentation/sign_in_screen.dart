@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/theme.dart';
 import '../../../core/errors/failure.dart';
 import '../../../core/widgets/cashe_widgets.dart';
 import 'auth_controller.dart';
@@ -145,17 +144,7 @@ class _Header extends StatelessWidget {
     height: 40,
     child: Row(
       children: [
-        const CasheLogo(size: 32),
         const SizedBox(width: 10),
-        const Text(
-          'Cashe',
-          style: TextStyle(
-            fontSize: 19,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.4,
-            color: CasheColors.text,
-          ),
-        ),
         const Spacer(),
         if (onBack case final back?) PillButton(label: 'Back', onPressed: back),
       ],

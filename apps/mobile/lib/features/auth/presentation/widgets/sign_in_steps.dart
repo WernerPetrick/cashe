@@ -12,12 +12,6 @@ const _headline = TextStyle(
   color: CasheColors.text,
 );
 
-const _footnote = TextStyle(
-  fontSize: 12.5,
-  height: 1.5,
-  color: CasheColors.faint,
-);
-
 /// Step one: the concept art, the pitch and the email field.
 class EmailStep extends StatelessWidget {
   const EmailStep({
@@ -43,10 +37,10 @@ class EmailStep extends StatelessWidget {
           child: PlaceConcept(),
         ),
         const Spacer(),
-        const Text('Money that waits for the right place.', style: _headline),
+        const Text('Spend it where you meant to.', style: _headline),
         const SizedBox(height: 10),
         Text(
-          'Cashe holds your funds until you arrive where you chose to spend them.',
+          'Lock money to a place, and Cashe keeps it safe until you get there.',
           style: Theme.of(context).textTheme.bodyLarge
               ?.copyWith(height: 1.5, color: CasheColors.textBody),
         ),
@@ -67,18 +61,11 @@ class EmailStep extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         FilledButton(onPressed: onContinue, child: const Text('Continue')),
-        const SizedBox(height: 14),
-        const Text(
-          'Next you’ll sign in, or set up a new wallet if you’re new.',
-          textAlign: TextAlign.center,
-          style: _footnote,
-        ),
       ],
     ),
   );
 }
 
-/// A place ring three-quarters full with a pulsing pin: "unlocks when you arrive".
 class PlaceConcept extends StatelessWidget {
   const PlaceConcept({super.key});
 
@@ -107,37 +94,10 @@ class PlaceConcept extends StatelessWidget {
           ),
         ),
       ),
-      const SizedBox(height: 18),
-      const _PlaceChip('Unlocks at · Riverside Market'),
     ],
   );
 }
 
-class _PlaceChip extends StatelessWidget {
-  const _PlaceChip(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.fromLTRB(10, 7, 12, 7),
-    decoration: BoxDecoration(
-      color: CasheColors.surface,
-      border: Border.all(color: CasheColors.border),
-      borderRadius: BorderRadius.circular(999),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const CircleAvatar(radius: 3.5, backgroundColor: CasheColors.amber),
-        const SizedBox(width: 8),
-        Flexible(child: MonoLabel(text, color: CasheColors.textSoft)),
-      ],
-    ),
-  );
-}
-
-/// Step two: sign in, or create an account, for the email from step one.
 class PasswordStep extends StatelessWidget {
   const PasswordStep({
     super.key,

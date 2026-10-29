@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby
+# Drives the Android emulator's GPS around a place for demo recordings.
+#
+#   scripts/demo_location walk-in  --place 1          # walk into the zone and stay
+#   scripts/demo_location teleport --place 1          # sit 5 km away, then jump in (impossible_jump)
+#   scripts/demo_location away     --at -33.92,18.42  # park the device far from the place
+#
+# --place reads the place's centre from the dev database (run with the same DB_* env as Rails);
+# --at takes "lat,lng" directly. Fixes go through `adb emu geo fix`, which the app sees as real
+# GPS, not a mock provider, so the server's checks run exactly as in production.
+
+require "open3"
+require "optparse"
+
+METRES_PER_DEGREE = 111_320.0
+API_DIR = File.expand_path("../apps/api", __dir__)
+
+options = { distance: 90, speed: 1.5, hold: 120, away: 5_000, device: ENV.fetch("ANDROID_SERIAL", "emulator-5554") }
+parser = OptionParser.new do |o|
+  o.banner = "Usage: scripts/demo_location walk-in|teleport|away (--place ID | --at LAT,LNG) [options]"
+  o.on("--place ID", Integer, "Place id in the dev database") { |v| options[:place] = v }
+  o.on("--at LAT,LNG", Array, "Centre point instead of a place") { |v| options[:at] = v.map { Float(_1) } }
+  o.on("--distance M", Float, "walk-in: start this far from the centre (default 90)") { |v| options[:distance] = v }
+  o.on("--speed MPS", Float, "walk-in: walking speed (default 1.5)") { |v| options[:speed] = v }
+  o.on("--hold S", Integer, "Seconds to stay at the centre at the end (default 120)") { |v| options[:hold] = v }
+  o.on("--away M", Float, "teleport/away: how far away to start (default 5000)") { |v| options[:away] = v }
+  o.on("--device SERIAL", "adb device (default emulator-5554)") { |v| options[:device] = v }
+end
+parser.parse!
+command = ARGV.shift
+abort parser.banner unless %w[walk-in teleport away].include?(command) && (options[:place] || options[:at])
+
+def place_centre(id)
+  script = "p = Place.find(ARGV.first); puts [p.latitude, p.longitude].join(',')"
+  out, status = Open3.capture2("bin/rails", "runner", script, id.to_s, chdir: API_DIR)
+  abort "Could not read place #{id} from the dev database" unless status.success?
+  out.lines.last.split(",").map { Float(_1) }
+end
+
+# A point `metres` south of the centre (negative = north).
+def south_of((lat, lng), metres)
+  [lat - metres / METRES_PER_DEGREE, lng]
+end
+
+def fix(device, (lat, lng))
+  # geo fix takes longitude first.
+  system("adb", "-s", device, "emu", "geo", "fix", format("%.7f", lng), format("%.7f", lat), exception: true)
+end
+
+def hold(device, point, seconds)
+  seconds.times do
+    fix(device, point)
+    sleep 1
+  end
+end
+
+centre = options[:at] || place_centre(options[:place])
+device = options[:device]
+
+case command
+when "walk-in"
+  steps = (options[:distance] / options[:speed]).ceil
+  puts "Walking #{options[:distance].round} m into the zone over #{steps} s, then holding #{options[:hold]} s"
+  steps.downto(1) do |step|
+    fix(device, south_of(centre, step * options[:speed]))
+    sleep 1
+  end
+  hold(device, centre, options[:hold])
+when "teleport"
+  puts "Holding #{options[:away].round} m away for 25 s, then jumping to the centre"
+  hold(device, south_of(centre, options[:away]), 25)
+  puts "Jump!"
+  hold(device, centre, options[:hold])
+when "away"
+  fix(device, south_of(centre, options[:away]))
+  puts "Parked #{options[:away].round} m from the centre"
+end

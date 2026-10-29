@@ -11,12 +11,12 @@ class CasheApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-    // A claim link opens the claim screen; signed-out users sign in first.
     ref.listen(claimTokensProvider, (_, token) {
       if (token.value case final value?) router.go('/claim/$value');
     });
     return MaterialApp.router(
       title: 'Cashe',
+      debugShowCheckedModeBanner: false,
       theme: buildTheme(),
       routerConfig: router,
     );
