@@ -8,7 +8,6 @@ import '../../domain/time_window.dart';
 import '../../domain/wallet_text.dart';
 import 'time_window_dialog.dart';
 
-/// Step 3: review the lock or gift, with its name, times and (for gifts) expiry.
 class CreateReviewStep extends StatelessWidget {
   const CreateReviewStep({
     super.key,
@@ -49,7 +48,7 @@ class CreateReviewStep extends StatelessWidget {
             children: [
               const SizedBox(height: 24),
               Text(
-                isGift ? 'Review your gift' : 'Review your lock',
+                isGift ? 'Review your gift' : 'Review your spot',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 30),
@@ -180,7 +179,6 @@ class CreateReviewStep extends StatelessWidget {
   Future<void> _pickExpiry(BuildContext context) async {
     final now = DateTime.now();
     final tomorrow = now.add(const Duration(days: 1));
-    // Start on the earliest allowed day, so OK without tapping a day still sets it.
     final day = await showDatePicker(
       context: context,
       initialDate: tomorrow,

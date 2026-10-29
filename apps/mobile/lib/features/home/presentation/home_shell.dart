@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../app/theme.dart';
 import 'activity_tab.dart';
 import 'home_tab.dart';
 import 'me_tab.dart';
 
-/// The bottom-nav shell from the design: Home, Send, +, Activity, Me.
-/// Send starts a gift and + starts a savings goal; the others are tabs.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -33,25 +30,16 @@ class _HomeShellState extends State<HomeShell> {
       bottomNavigationBar: _NavBar(
         tab: _tab,
         onTab: (tab) => setState(() => _tab = tab),
-        onSend: () => context.push('/wallets/new/gift'),
-        onLock: () => context.push('/wallets/new/goal'),
       ),
     );
   }
 }
 
 class _NavBar extends StatelessWidget {
-  const _NavBar({
-    required this.tab,
-    required this.onTab,
-    required this.onSend,
-    required this.onLock,
-  });
+  const _NavBar({required this.tab, required this.onTab});
 
   final _Tab tab;
   final ValueChanged<_Tab> onTab;
-  final VoidCallback onSend;
-  final VoidCallback onLock;
 
   @override
   Widget build(BuildContext context) {
@@ -70,10 +58,6 @@ class _NavBar extends StatelessWidget {
                 label: 'Home',
                 active: tab == _Tab.home,
                 onTap: () => onTab(_Tab.home),
-              ),
-              _NavItem(label: 'Send', active: false, onTap: onSend),
-              Expanded(
-                child: Center(child: _LockButton(onPressed: onLock)),
               ),
               _NavItem(
                 label: 'Activity',
@@ -136,28 +120,6 @@ class _NavItem extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _LockButton extends StatelessWidget {
-  const _LockButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.square(
-      dimension: 46,
-      child: IconButton.filled(
-        tooltip: 'New savings goal',
-        onPressed: onPressed,
-        style: IconButton.styleFrom(
-          backgroundColor: CasheColors.amber,
-          foregroundColor: CasheColors.background,
-        ),
-        icon: const Icon(Icons.add, size: 26),
       ),
     );
   }

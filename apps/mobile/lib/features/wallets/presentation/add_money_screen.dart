@@ -11,7 +11,6 @@ import '../../../core/widgets/error_view.dart';
 import '../domain/wallet.dart';
 import 'wallet_providers.dart';
 
-/// "Add money" from the design: a simulated top-up into one of the pots I fund.
 class AddMoneyScreen extends ConsumerStatefulWidget {
   const AddMoneyScreen({super.key, this.walletId});
 
@@ -34,7 +33,6 @@ class _AddMoneyScreenState extends ConsumerState<AddMoneyScreen> {
     _selected = widget.walletId;
   }
 
-  /// Pots I can top up: my goals and the gifts I'm funding that are still open.
   List<Wallet> _targets(List<Wallet> wallets) => wallets
       .where(
         (wallet) =>
@@ -150,8 +148,6 @@ class _AddMoneyScreenState extends ConsumerState<AddMoneyScreen> {
   }
 }
 
-/// The pretend account a top-up comes from. Display only: deposits are
-/// simulated, so the API never sees which bank was picked.
 class _FromRow extends StatelessWidget {
   const _FromRow({required this.bank, required this.onPick});
 
@@ -219,7 +215,7 @@ class _PotChoices extends StatelessWidget {
   Widget build(BuildContext context) {
     if (targets.isEmpty) {
       return const Text(
-        'No pots to top up yet. Lock some money or send a gift first.',
+        'No spots to top up yet. Start one or send one first.',
         style: TextStyle(color: CasheColors.muted),
       );
     }

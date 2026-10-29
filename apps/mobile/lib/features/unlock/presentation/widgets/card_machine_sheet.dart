@@ -62,7 +62,7 @@ class _CardMachineSheetState extends State<CardMachineSheet> {
           const SizedBox(height: 6),
           Text(
             over
-                ? 'More than the ${Money(widget.balanceCents, widget.currency).format()} in this pot'
+                ? 'More than the ${Money(widget.balanceCents, widget.currency).format()} in this spot'
                 : 'Then the phone is tapped',
             textAlign: TextAlign.center,
             style: TextStyle(

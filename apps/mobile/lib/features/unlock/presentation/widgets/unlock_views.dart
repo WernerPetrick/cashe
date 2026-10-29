@@ -10,8 +10,6 @@ import '../../../wallets/domain/wallet.dart';
 import '../../../wallets/domain/wallet_text.dart';
 import '../../domain/ping_outcome.dart';
 
-/// A centred status screen with a ring on top, a title, a line of text and
-/// buttons at the bottom: the layout every unlock state in the design shares.
 class StatusLayout extends StatelessWidget {
   const StatusLayout({
     super.key,
@@ -83,8 +81,6 @@ class LockedRing extends StatelessWidget {
   );
 }
 
-/// "Checking you're at X": the ring fills over the place's dwell time.
-/// Before the first answer it spins.
 class CheckingView extends StatelessWidget {
   const CheckingView({
     super.key,
@@ -145,8 +141,6 @@ class CheckingView extends StatelessWidget {
   }
 }
 
-/// "Still locked": outside the zone, outside the hours, or a rejected fix.
-/// Pings keep running, so it unlocks by itself once things are right.
 class StillLockedView extends StatelessWidget {
   const StillLockedView({
     super.key,
@@ -163,7 +157,7 @@ class StillLockedView extends StatelessWidget {
     PingStatus.outsideTimeWindow => (
       'outside_time_window',
       'Outside the allowed times',
-      'This pot opens at ${wallet.place.name} ${WalletText.windows(wallet.timeWindows)}.',
+      'This spot opens at ${wallet.place.name} ${WalletText.windows(wallet.timeWindows)}.',
     ),
     PingStatus.rejected when outcome.reason == RejectionReason.mockLocation => (
       'rejected',
@@ -184,7 +178,7 @@ class StillLockedView extends StatelessWidget {
     _ => (
       'outside_zone',
       'Still locked',
-      'This pot opens at ${wallet.place.name}. Get within ${wallet.place.radiusM} m and it unlocks by itself.',
+      'This spot opens at ${wallet.place.name}. Get within ${wallet.place.radiusM} m and it unlocks by itself.',
     ),
   };
 
@@ -197,13 +191,12 @@ class StillLockedView extends StatelessWidget {
       title: title,
       message: message,
       actions: [
-        OutlinedButton(onPressed: onBack, child: const Text('Back to pot')),
+        OutlinedButton(onPressed: onBack, child: const Text('Back to spot')),
       ],
     );
   }
 }
 
-/// Unlocked: the amber card, "tap your phone" and a live relock countdown.
 class UnlockedView extends StatefulWidget {
   const UnlockedView({
     super.key,
@@ -385,7 +378,6 @@ class _SimulateTapButton extends StatelessWidget {
   }
 }
 
-/// Paid: the amount, where, and what's left in the pot.
 class PaidView extends StatelessWidget {
   const PaidView({
     super.key,
@@ -483,7 +475,7 @@ class _LeftInPot extends StatelessWidget {
       child: Row(
         children: [
           const Text(
-            'Left in pot',
+            'Left in spot',
             style: TextStyle(fontSize: 14, color: CasheColors.textSoft),
           ),
           const Spacer(),

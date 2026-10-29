@@ -73,7 +73,7 @@ Future<void> runHappyPath(WidgetTester tester) async {
   // Pat sends a gift.
   await signIn(tester, parentEmail);
   expect(find.text('Hi Pat'), findsOneWidget);
-  await tapText(tester, 'Send', first: true);
+  await tapText(tester, 'Send cash');
   for (final key in ['1', '0']) {
     await tester.tap(find.byKey(Key('key-$key')));
   }
@@ -142,6 +142,7 @@ Future<void> runHappyPath(WidgetTester tester) async {
 
   // Pat sees who claimed it and what was spent, but not where Sam was.
   await signIn(tester, parentEmail);
+  await tapText(tester, 'Activity');
   expect(find.textContaining('Claimed by Sam'), findsWidgets);
   await tapText(tester, 'School Tuckshop');
   expect(find.textContaining('Claimed by Sam'), findsWidgets);

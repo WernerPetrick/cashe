@@ -41,16 +41,34 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('no pots: no locked-pots chip', (tester) async {
+  testWidgets('no spots: says how to start one', (tester) async {
     await pumpHome(tester, []);
 
-    expect(find.text('R0.00'), findsOneWidget);
-    expect(find.textContaining('locked pot'), findsNothing);
+    expect(find.text('0 spots'), findsOneWidget);
+    expect(find.textContaining('No spots yet'), findsOneWidget);
+    expect(find.text('New spot'), findsOneWidget);
+    expect(find.text('Send cash'), findsOneWidget);
   });
 
-  testWidgets('counts locked pots', (tester) async {
-    await pumpHome(tester, [coffee]);
+  testWidgets('lists my spots, not gifts I sent', (tester) async {
+    const sent = Wallet(
+      id: 2,
+      kind: WalletKind.gift,
+      name: 'Pocket money',
+      status: WalletStatus.active,
+      role: WalletRole.funder,
+      place: PlaceRef(id: 1, name: 'Test Tuckshop'),
+      currency: 'ZAR',
+      balanceCents: 500,
+      fundedCents: 500,
+      funderName: 'Sam Parent',
+      ownerName: 'Sam',
+    );
+    await pumpHome(tester, [coffee, sent]);
 
-    expect(find.text('1 locked pot'), findsOneWidget);
+    expect(find.text('1 spot'), findsOneWidget);
+    expect(find.text('Good Coffee'), findsOneWidget);
+    expect(find.text('Pocket money'), findsNothing);
+    expect(find.text('Total balance'), findsNothing);
   });
 }

@@ -5,8 +5,10 @@ import '../../../core/widgets/cashe_widgets.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../wallets/data/wallets_repository.dart';
 import '../../wallets/domain/ledger_entry.dart';
+import '../../wallets/domain/wallet.dart';
 import '../../wallets/presentation/wallet_providers.dart';
 import '../../wallets/presentation/widgets/ledger_entry_tile.dart';
+import '../../wallets/presentation/widgets/spot_row.dart';
 
 typedef ActivityItem = ({LedgerEntry entry, String walletName});
 
@@ -40,6 +42,7 @@ class ActivityTab extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(22, 16, 22, 24),
           children: [
+            const _SentGifts(),
             const MonoLabel('Activity'),
             const SizedBox(height: 8),
             if (items.isEmpty)
@@ -57,6 +60,36 @@ class ActivityTab extends ConsumerWidget {
         onRetry: () => ref.invalidate(activityProvider),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
+/// Spots I've sent to other people, so I can re-share, top up or cancel them.
+/// Hidden until I've sent one.
+class _SentGifts extends ConsumerWidget {
+  const _SentGifts();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final wallets = ref.watch(walletsProvider).value ?? const <Wallet>[];
+    final sent = wallets
+        .where(
+          (wallet) =>
+              wallet.role == WalletRole.funder &&
+              wallet.kind == WalletKind.gift,
+        )
+        .toList();
+    if (sent.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const MonoLabel('Spots you sent'),
+          const SizedBox(height: 8),
+          for (final gift in sent) SpotRow(wallet: gift),
+        ],
+      ),
     );
   }
 }
