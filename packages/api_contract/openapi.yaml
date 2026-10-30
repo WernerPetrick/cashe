@@ -107,6 +107,41 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "422": { $ref: "#/components/responses/Unprocessable" }
+  /place_searches:
+    get:
+      operationId: searchPlaces
+      summary: Real-world places matching a query, biased toward a map centre (at most 8; ADR 0006)
+      description: >-
+        Rails asks Photon (OpenStreetMap) on the app's behalf. Results aren't Cashe places yet:
+        the app creates one with POST /places when the user picks a result.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: What to search for, 2–100 characters
+          schema: { type: string }
+        - name: near
+          in: query
+          required: true
+          description: "The map centre as latitude,longitude (never the device's location)"
+          schema: { type: string }
+      responses:
+        "200":
+          description: Matching places, best first
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [results]
+                properties:
+                  results:
+                    type: array
+                    items: { $ref: "#/components/schemas/PlaceSearchResult" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/Unprocessable" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "503": { $ref: "#/components/responses/PlaceSearchUnavailable" }
   /wallets:
     get:
       operationId: listWallets
@@ -320,7 +355,7 @@ components:
           schema: { $ref: "#/components/schemas/Error" }
     Unprocessable:
       description: >-
-        Invalid input or a refused rule: `validation_failed`, `invalid_email`, `invalid_location`, `invalid_ping`,
+        Invalid input or a refused rule: `validation_failed`, `invalid_email`, `invalid_location`, `invalid_query`, `invalid_ping`,
         `invalid_amount`, `invalid_idempotency_key`, `insufficient_funds`, `invalid_claim` or `own_gift`
       content:
         application/json:
@@ -332,6 +367,11 @@ components:
           schema: { $ref: "#/components/schemas/Error" }
     AuthUnavailable:
       description: Appwrite could not be reached to check the JWT or look up the account (code `auth_unavailable`)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    PlaceSearchUnavailable:
+      description: The place search could not be reached or answered unexpectedly (code `place_search_unavailable`)
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Error" }
@@ -370,6 +410,17 @@ components:
         distance_m:
           type: integer
           description: Only on nearby-search results
+    PlaceSearchResult:
+      type: object
+      additionalProperties: false
+      required: [name, address, latitude, longitude]
+      properties:
+        name: { type: string }
+        address:
+          type: string
+          description: Street, area and city, comma-separated; may be empty
+        latitude: { type: number }
+        longitude: { type: number }
     TimeWindow:
       type: object
       additionalProperties: false

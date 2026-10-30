@@ -14,3 +14,5 @@ shared:
   # Custom scheme for now (opens the app directly); https App Links can replace it in Phase 4.
   claim_url_base: cashe://claim/
   currencies: [ZAR, USD, EUR, GBP]
+  # Real-world place search (ADR 0006): komoot's public Photon, fair use only.
+  place_search_url: <%= ENV.fetch("CASHE_PLACE_SEARCH_URL", "https://photon.komoot.io/api/") %>

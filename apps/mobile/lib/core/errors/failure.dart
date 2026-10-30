@@ -71,6 +71,8 @@ class Failure implements Exception {
     'own_gift' => "You can't claim your own gift.",
     'not_cancellable' => 'This gift has already been claimed.',
     'invalid_location' || 'invalid_ping' => "Your location couldn't be read.",
+    'invalid_query' => 'Type at least 2 letters to search.',
+    'place_search_unavailable' => "Place search isn't available right now. Try again, or add the place on the map.",
     _ => 'Something went wrong. Please try again.',
   };
 

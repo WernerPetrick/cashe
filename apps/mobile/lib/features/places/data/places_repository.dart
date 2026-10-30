@@ -23,6 +23,23 @@ class PlacesRepository {
     return result.unwrap();
   }
 
+  /// Real-world places matching [query], biased toward a map centre.
+  Future<List<PlaceSuggestion>> search(
+    String query,
+    double latitude,
+    double longitude,
+  ) async {
+    final params = Uri(
+      queryParameters: {'q': query, 'near': '$latitude,$longitude'},
+    ).query;
+    final result = await _api.get('/place_searches?$params', (json) {
+      return (json['results'] as List)
+          .map((hit) => PlaceSuggestion.fromJson(hit as Map<String, dynamic>))
+          .toList();
+    });
+    return result.unwrap();
+  }
+
   Future<Place> create(PlaceDraft draft) async => (await _api.post(
     '/places',
     Place.fromJson,

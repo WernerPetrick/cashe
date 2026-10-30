@@ -188,6 +188,7 @@ Versioned JSON under `/api/v1`. Keep `packages/api_contract/openapi.yaml` update
 | GET | `/me` | Current user |
 | GET | `/places?near=lat,lng` | Places near a point |
 | POST | `/places` | Create a place |
+| GET | `/place_searches?q=…&near=lat,lng` | Real-world places from Photon/OpenStreetMap, biased to the map centre (rate-limited; ADR 0006) |
 | GET | `/wallets` | Wallets I own or funded, with computed balances |
 | POST | `/wallets` | Create a goal or gift (place + time windows + optional expiry) |
 | GET | `/wallets/:id` | Detail, unlock rules, recent ledger entries |

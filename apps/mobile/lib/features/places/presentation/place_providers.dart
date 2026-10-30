@@ -11,6 +11,16 @@ MapCentre roundCentre(double latitude, double longitude) {
   return (latitude: round(latitude), longitude: round(longitude));
 }
 
+typedef PlaceQuery = ({String text, MapCentre centre});
+
+/// Real-world places for a search box query (ADR 0006).
+final placeSearchProvider = FutureProvider.autoDispose
+    .family<List<PlaceSuggestion>, PlaceQuery>(
+      (ref, query) => ref
+          .watch(placesRepositoryProvider)
+          .search(query.text, query.centre.latitude, query.centre.longitude),
+    );
+
 final nearbyPlacesProvider = FutureProvider.autoDispose
     .family<List<Place>, MapCentre>(
       (ref, centre) => ref

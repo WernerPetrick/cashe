@@ -26,6 +26,7 @@ module ActionDispatch
     teardown do
       AppwriteAuth.verifier = nil
       AppwriteAuth.directory = nil
+      PlaceSearch.provider = nil
     end
 
     def sign_in_as(appwrite_user_id, token: "valid-jwt", name: "Pat Parent")

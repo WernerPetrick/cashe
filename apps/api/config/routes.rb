@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       get "me", to: "me#show"
 
       resources :places, only: %i[index create]
+      resources :place_searches, only: :index
       resources :gift_claims, only: :create
 
       resources :wallets, only: %i[index show create] do

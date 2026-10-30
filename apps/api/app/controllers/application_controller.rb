@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::API
   ERROR_STATUS = {
     unauthorized: :unauthorized, forbidden: :forbidden, not_found: :not_found,
-    auth_unavailable: :service_unavailable, rate_limited: :too_many_requests,
+    auth_unavailable: :service_unavailable, place_search_unavailable: :service_unavailable, rate_limited: :too_many_requests,
     wallet_closed: :conflict, wallet_locked: :conflict, idempotency_conflict: :conflict, not_cancellable: :conflict
   }.freeze
 

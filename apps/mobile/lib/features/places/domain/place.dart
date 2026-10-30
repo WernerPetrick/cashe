@@ -19,6 +19,21 @@ abstract class Place with _$Place {
   factory Place.fromJson(Map<String, dynamic> json) => _$PlaceFromJson(json);
 }
 
+/// A real-world place from the outside search (ADR 0006). Not a Cashe place
+/// yet: picking one creates a [Place] at its point.
+@freezed
+abstract class PlaceSuggestion with _$PlaceSuggestion {
+  const factory PlaceSuggestion({
+    required String name,
+    required String address,
+    required double latitude,
+    required double longitude,
+  }) = _PlaceSuggestion;
+
+  factory PlaceSuggestion.fromJson(Map<String, dynamic> json) =>
+      _$PlaceSuggestionFromJson(json);
+}
+
 /// What the app sends to create a place.
 @freezed
 abstract class PlaceDraft with _$PlaceDraft {

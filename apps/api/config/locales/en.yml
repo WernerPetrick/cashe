@@ -9,6 +9,8 @@ en:
       validation_failed: "Some details need fixing."
       invalid_email: "Enter a valid email address."
       invalid_location: "Send near as latitude,longitude."
+      invalid_query: "Search for 2 to 100 characters."
+      place_search_unavailable: "Place search isn't available right now. Try again, or add the place on the map."
       invalid_ping: "Send latitude, longitude and accuracy_m."
       invalid_amount: "Amounts are positive whole numbers of cents."
       invalid_idempotency_key: "Send an idempotency_key of up to 100 characters."

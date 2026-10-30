@@ -10,16 +10,22 @@ import '../domain/place.dart';
 
 /// Names a new place at a point on the map and sets its zone and dwell time.
 class NewPlaceSheet extends ConsumerStatefulWidget {
-  const NewPlaceSheet({super.key, required this.point});
+  const NewPlaceSheet({super.key, required this.point, this.name});
 
   final LatLng point;
 
-  static Future<Place?> show(BuildContext context, LatLng point) =>
-      showModalBottomSheet<Place>(
-        context: context,
-        isScrollControlled: true,
-        builder: (_) => NewPlaceSheet(point: point),
-      );
+  /// Pre-fills the name (from a search result).
+  final String? name;
+
+  static Future<Place?> show(
+    BuildContext context,
+    LatLng point, {
+    String? name,
+  }) => showModalBottomSheet<Place>(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => NewPlaceSheet(point: point, name: name),
+  );
 
   @override
   ConsumerState<NewPlaceSheet> createState() => _NewPlaceSheetState();
@@ -28,7 +34,7 @@ class NewPlaceSheet extends ConsumerStatefulWidget {
 class _NewPlaceSheetState extends ConsumerState<NewPlaceSheet> {
   static const _dwellChoices = [30, 60, 120, 300];
 
-  final _name = TextEditingController();
+  late final _name = TextEditingController(text: widget.name);
   double _radius = 50;
   int _dwell = Env.isDev ? 30 : 120;
   bool _saving = false;
